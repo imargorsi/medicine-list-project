@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import type { ColumnDef } from "@tanstack/react-table"
-import { Trash2 } from "lucide-react"
+import type { ColumnDef } from "@tanstack/react-table";
+import { Trash2 } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import type { ListItemRow } from "@/types/medicine"
+import { Button } from "@/components/ui/button";
+import type { ListItemRow } from "@/types/medicine";
 
 type CreateListItemsColumnsOptions = {
-  onRemove: (itemId: string) => void
-}
+  onRemove: (itemId: string) => void;
+};
 
 export function createListItemsColumns({
   onRemove,
@@ -37,5 +37,5 @@ export function createListItemsColumns({
         </Button>
       ),
     },
-  ]
+  ];
 }

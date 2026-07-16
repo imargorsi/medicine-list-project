@@ -27,7 +27,14 @@ The catalog module. Build this before the lists module — creating a list depen
   ```json
   {
     "success": true,
-    "data": [{ "id": "...", "name": "...", "default_quantity": 10, "created_at": "..." }],
+    "data": [
+      {
+        "id": "...",
+        "name": "...",
+        "default_quantity": 10,
+        "created_at": "..."
+      }
+    ],
     "meta": { "page": 1, "limit": 10, "total": 42, "totalPages": 5 }
   }
   ```
@@ -56,7 +63,7 @@ The catalog module. Build this before the lists module — creating a list depen
 - `404` if `id` doesn't exist or isn't a valid ObjectId.
 - Set `updated_at` on write.
 - Response: `200` with the updated medicine.
-- **Note:** editing a medicine's name here does *not* retroactively change medicines already saved inside past monthly lists — see doc 02's snapshot design. That's intentional, not a bug to fix later.
+- **Note:** editing a medicine's name here does _not_ retroactively change medicines already saved inside past monthly lists — see doc 02's snapshot design. That's intentional, not a bug to fix later.
 
 ## 4. Delete a medicine
 

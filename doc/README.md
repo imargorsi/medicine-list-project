@@ -30,7 +30,11 @@ Also read [03-open-questions.md](03-open-questions.md) — decisions that need y
   ```
 - Paginated responses nest pagination info under `meta`:
   ```json
-  { "success": true, "data": [], "meta": { "page": 1, "limit": 10, "total": 42, "totalPages": 5 } }
+  {
+    "success": true,
+    "data": [],
+    "meta": { "page": 1, "limit": 10, "total": 42, "totalPages": 5 }
+  }
   ```
 - IDs: use MongoDB's `_id`, but serialize it as `id` (string) in API responses — the frontend types (`Medicine.id`, `MedicineListItem.id`, etc.) already expect `id`, not `_id`.
 - Validate at the route handler boundary. No validation library is installed yet — decide with open question #2 before writing the first handler.

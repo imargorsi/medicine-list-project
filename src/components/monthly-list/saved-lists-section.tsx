@@ -1,47 +1,53 @@
-"use client"
+"use client";
 
-import { useMemo, useState } from "react"
+import { useMemo, useState } from "react";
 
-import { FinalListOutput, formatMonth } from "@/components/monthly-list/final-list-output"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import {
+  FinalListOutput,
+  formatMonth,
+} from "@/components/monthly-list/final-list-output";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import type { Medicine, MedicineList } from "@/types/medicine"
+} from "@/components/ui/card";
+import type { Medicine, MedicineList } from "@/types/medicine";
 
 type SavedListsSectionProps = {
-  lists: MedicineList[]
-  medicines: Medicine[]
-}
+  lists: MedicineList[];
+  medicines: Medicine[];
+};
 
-export function SavedListsSection({ lists, medicines }: SavedListsSectionProps) {
-  const [selectedListId, setSelectedListId] = useState("")
-  const [prevLists, setPrevLists] = useState(lists)
+export function SavedListsSection({
+  lists,
+  medicines,
+}: SavedListsSectionProps) {
+  const [selectedListId, setSelectedListId] = useState("");
+  const [prevLists, setPrevLists] = useState(lists);
 
   if (lists !== prevLists) {
-    setPrevLists(lists)
+    setPrevLists(lists);
     if (lists.length > 0 && !lists.some((list) => list.id === selectedListId)) {
-      setSelectedListId(lists[0].id)
+      setSelectedListId(lists[0].id);
     }
   }
 
-  const selectedList = lists.find((list) => list.id === selectedListId)
+  const selectedList = lists.find((list) => list.id === selectedListId);
 
   const selectedRows = useMemo(() => {
-    if (!selectedList) return []
+    if (!selectedList) return [];
 
     return selectedList.items.map((item) => ({
       ...item,
       medicine_name:
         medicines.find((medicine) => medicine.id === item.medicine_id)?.name ??
         "Unknown medicine",
-    }))
-  }, [selectedList, medicines])
+    }));
+  }, [selectedList, medicines]);
 
   if (lists.length === 0) {
     return (
@@ -53,7 +59,7 @@ export function SavedListsSection({ lists, medicines }: SavedListsSectionProps) 
           </CardDescription>
         </CardHeader>
       </Card>
-    )
+    );
   }
 
   return (
@@ -61,7 +67,9 @@ export function SavedListsSection({ lists, medicines }: SavedListsSectionProps) 
       <Card>
         <CardHeader>
           <CardTitle>Saved Lists</CardTitle>
-          <CardDescription>View and copy your previously saved monthly lists.</CardDescription>
+          <CardDescription>
+            View and copy your previously saved monthly lists.
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           {lists.map((list) => (
@@ -71,7 +79,7 @@ export function SavedListsSection({ lists, medicines }: SavedListsSectionProps) 
             >
               <div>
                 <p className="font-medium">{list.list_name}</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   {formatMonth(list.month)} · {list.items.length} medicines
                 </p>
               </div>
@@ -98,5 +106,5 @@ export function SavedListsSection({ lists, medicines }: SavedListsSectionProps) 
         />
       ) : null}
     </div>
-  )
+  );
 }

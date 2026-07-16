@@ -14,6 +14,7 @@ Create + view only for now — no edit, no delete. Build this after the Medicine
 - `created_at`: Date
 
 **Design call (mentor note):** embed `items` directly in the list document, and copy `medicine_name` into each item at creation time instead of joining against `medicines` on every read. Why:
+
 - The frontend already renders lists this way (`MedicineList.items` is embedded, no separate fetch per list).
 - It keeps saved-list history accurate even if a medicine is later renamed or deleted from the catalog — a list from March should still read "March" the way it looked in March.
 - It avoids a join/lookup for a feature that's read-only and low-volume.
@@ -62,7 +63,14 @@ Create + view only for now — no edit, no delete. Build this after the Medicine
         "list_name": "March Purchase",
         "month": "2026-03",
         "created_at": "...",
-        "items": [{ "id": "...", "medicine_id": "...", "medicine_name": "...", "quantity": 2 }]
+        "items": [
+          {
+            "id": "...",
+            "medicine_id": "...",
+            "medicine_name": "...",
+            "quantity": 2
+          }
+        ]
       }
     ]
   }
