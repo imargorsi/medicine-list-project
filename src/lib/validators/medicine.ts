@@ -6,6 +6,3 @@ export const createMedicineSchema = z.object({
 });
 
 export type CreateMedicineSchema = z.infer<typeof createMedicineSchema>;
-
-
- 
