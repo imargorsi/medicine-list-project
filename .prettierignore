@@ -1,0 +1,16 @@
+# Build output
+.next/
+out/
+build/
+next-env.d.ts
+
+# Dependencies
+node_modules/
+
+# Lockfiles
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Generated shadcn primitives
+src/components/ui/

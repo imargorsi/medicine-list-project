@@ -1,23 +1,25 @@
-import { useEffect, useState } from "react"
+"use client";
 
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import type { Medicine } from "@/types/medicine"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import type { Medicine } from "@/types/medicine";
 
 type MedicineFormDialogProps = {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  medicine?: Medicine | null
-  onSave: (data: { name: string; default_quantity: number }) => void
-}
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  medicine?: Medicine | null;
+  onSave: (data: { name: string; default_quantity: number }) => void;
+};
 
 export function MedicineFormDialog({
   open,
@@ -25,33 +27,37 @@ export function MedicineFormDialog({
   medicine,
   onSave,
 }: MedicineFormDialogProps) {
-  const [name, setName] = useState("")
-  const [defaultQuantity, setDefaultQuantity] = useState("1")
+  const [name, setName] = useState("");
+  const [defaultQuantity, setDefaultQuantity] = useState("1");
+  const [wasOpen, setWasOpen] = useState(open);
 
-  useEffect(() => {
+  if (open !== wasOpen) {
+    setWasOpen(open);
     if (open) {
-      setName(medicine?.name ?? "")
-      setDefaultQuantity(String(medicine?.default_quantity ?? 1))
+      setName(medicine?.name ?? "");
+      setDefaultQuantity(String(medicine?.default_quantity ?? 1));
     }
-  }, [open, medicine])
+  }
 
   const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault()
-    const quantity = Number(defaultQuantity)
-    if (!name.trim() || !quantity || quantity < 1) return
+    event.preventDefault();
+    const quantity = Number(defaultQuantity);
+    if (!name.trim() || !quantity || quantity < 1) return;
 
     onSave({
       name: name.trim(),
       default_quantity: quantity,
-    })
-    onOpenChange(false)
-  }
+    });
+    onOpenChange(false);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{medicine ? "Edit Medicine" : "Add Medicine"}</DialogTitle>
+          <DialogTitle>
+            {medicine ? "Edit Medicine" : "Add Medicine"}
+          </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
@@ -76,13 +82,19 @@ export function MedicineFormDialog({
             />
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
               Cancel
             </Button>
-            <Button type="submit">{medicine ? "Save changes" : "Add medicine"}</Button>
+            <Button type="submit">
+              {medicine ? "Save changes" : "Add medicine"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

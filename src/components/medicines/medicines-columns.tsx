@@ -1,13 +1,15 @@
-import type { ColumnDef } from "@tanstack/react-table"
-import { Pencil, Trash2 } from "lucide-react"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import type { Medicine } from "@/types/medicine"
+import type { ColumnDef } from "@tanstack/react-table";
+import { Pencil, Trash2 } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import type { Medicine } from "@/types/medicine";
 
 type CreateMedicinesColumnsOptions = {
-  onEdit: (medicine: Medicine) => void
-  onDelete: (medicine: Medicine) => void
-}
+  onEdit: (medicine: Medicine) => void;
+  onDelete: (medicine: Medicine) => void;
+};
 
 export function createMedicinesColumns({
   onEdit,
@@ -47,5 +49,5 @@ export function createMedicinesColumns({
         </div>
       ),
     },
-  ]
+  ];
 }
