@@ -8,6 +8,14 @@ export const metadata: Metadata = {
   title: "Medicine List",
   description:
     "Save monthly medicines, build purchase lists, and copy the final list quickly.",
+  robots: {
+    index: false,
+    follow: false,
+    googleBot: {
+      index: false,
+      follow: false,
+    },
+  },
 };
 
 export default function RootLayout({
