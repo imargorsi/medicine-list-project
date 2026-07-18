@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { MedicinesSection } from "@/components/medicines/medicines-section";
@@ -13,10 +13,12 @@ import type {
   MedicineListItem,
 } from "@/types/medicine";
 
-// NOTE: This page currently manages all state in memory on the client.
-// There is no backend wired up yet — swap these handlers for real API calls
-// (REST route handlers, server actions, a database, etc.) when the backend
-// is ready. Nothing here persists across a page refresh.
+// NOTE: Medicines are backed by /api/medicines. Monthly lists still live in
+// client state only — swap them for /api/lists once that backend exists.
+
+type ApiResult<T> =
+  | { success: true; data: T }
+  | { success: false; error: { message: string } };
 
 function createId() {
   return crypto.randomUUID();
@@ -44,37 +46,91 @@ export default function Home() {
     setDraftItems([]);
   };
 
-  const handleAddMedicine = (data: {
+  useEffect(() => {
+    const loadMedicines = async () => {
+      try {
+        const res = await fetch("/api/medicines");
+        const result: ApiResult<Medicine[]> = await res.json();
+        if (!result.success) {
+          toast.error(result.error.message);
+          return;
+        }
+        setMedicines(result.data);
+      } catch {
+        toast.error("Failed to load medicines.");
+      }
+    };
+
+    void loadMedicines();
+  }, []);
+
+  const handleAddMedicine = async (data: {
     name: string;
     default_quantity: number;
   }) => {
-    const medicine: Medicine = {
-      id: createId(),
-      name: data.name,
-      default_quantity: data.default_quantity,
-      created_at: new Date().toISOString(),
-    };
-    setMedicines((current) =>
-      [...current, medicine].sort((a, b) => a.name.localeCompare(b.name)),
-    );
-    toast.success("Medicine added.");
+    try {
+      const res = await fetch("/api/medicines", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const result: ApiResult<Medicine> = await res.json();
+      if (!result.success) {
+        toast.error(result.error.message);
+        return;
+      }
+  setMedicines((current) =>
+    [...current, result.data].sort((a, b) => a.name.localeCompare(b.name)),
+  );
+      toast.success("Medicine added.");
+    } catch {
+      toast.error("Failed to add medicine.");
+    }
   };
 
-  const handleEditMedicine = (
+  const handleEditMedicine = async (
     id: string,
     data: { name: string; default_quantity: number },
   ) => {
-    setMedicines((current) =>
-      current
-        .map((item) => (item.id === id ? { ...item, ...data } : item))
-        .sort((a, b) => a.name.localeCompare(b.name)),
-    );
-    toast.success("Medicine updated.");
+    try {
+      const res = await fetch(`/api/medicines/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const result: ApiResult<Medicine> = await res.json();
+      if (!result.success) {
+        toast.error(result.error.message);
+        return;
+      }
+      setMedicines((current) =>
+        current
+          .map((item) => (item.id === id ? result.data : item))
+          .sort((a, b) => a.name.localeCompare(b.name)),
+      );
+      toast.success("Medicine updated.");
+    } catch {
+      toast.error("Failed to update medicine.");
+    }
   };
 
-  const handleDeleteMedicine = (id: string) => {
-    setMedicines((current) => current.filter((medicine) => medicine.id !== id));
-    toast.success("Medicine deleted.");
+  const handleDeleteMedicine = async (id: string) => {
+    try {
+      const res = await fetch(`/api/medicines/${id}`, { method: "DELETE" });
+      if (!res.ok) {
+        const result: ApiResult<never> = await res.json();
+        toast.error(
+          result.success ? "Failed to delete medicine." : result.error.message,
+        );
+        return;
+      }
+      setMedicines((current) =>
+        current.filter((medicine) => medicine.id !== id),
+      );
+      toast.success("Medicine deleted.");
+    } catch {
+      toast.error("Failed to delete medicine.");
+    }
   };
 
   const handleAddDraftItem = (medicineId: string, quantity: number) => {
