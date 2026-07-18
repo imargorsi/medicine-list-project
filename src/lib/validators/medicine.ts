@@ -6,3 +6,19 @@ export const createMedicineSchema = z.object({
 });
 
 export type CreateMedicineSchema = z.infer<typeof createMedicineSchema>;
+
+
+export const updateMedicineSchema = createMedicineSchema.partial().refine((data) => data.name !== undefined || data.default_quantity !== undefined, {
+  message: "At least one of name or default_quantity must be present",
+});
+
+export type UpdateMedicineSchema = z.infer<typeof updateMedicineSchema>;
+
+
+export const listMedicinesQuerySchema = z.object({
+ search: z.string().trim().optional(),
+});
+
+export type ListMedicinesQuery = z.infer<
+  typeof listMedicinesQuerySchema
+>;
