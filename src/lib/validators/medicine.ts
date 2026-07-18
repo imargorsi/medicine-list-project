@@ -13,3 +13,12 @@ export const updateMedicineSchema = createMedicineSchema.partial().refine((data)
 });
 
 export type UpdateMedicineSchema = z.infer<typeof updateMedicineSchema>;
+
+
+export const listMedicinesQuerySchema = z.object({
+ search: z.string().trim().optional(),
+});
+
+export type ListMedicinesQuery = z.infer<
+  typeof listMedicinesQuerySchema
+>;

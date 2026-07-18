@@ -14,15 +14,14 @@ The catalog module. Build this before the lists module — creating a list depen
 
 ---
 
-## 1. List medicines (search + pagination)
+## 1. List medicines (search)
 
 `GET /api/medicines`
 
 - Query params:
   - `search` (optional) — case-insensitive partial match on `name`
-  - `page` (optional, default `1`)
-  - `limit` (optional, default `10`)
 - Sort: `name` ascending, always (matches how the frontend currently sorts client-side).
+- Pagination: not required for v1; return all matching medicines.
 - Response:
   ```json
   {
@@ -34,14 +33,13 @@ The catalog module. Build this before the lists module — creating a list depen
         "default_quantity": 10,
         "created_at": "..."
       }
-    ],
-    "meta": { "page": 1, "limit": 10, "total": 42, "totalPages": 5 }
+    ]
   }
   ```
 - Steps to implement:
-  1. Parse and clamp `page`/`limit` (reject or clamp negative/zero/absurdly large values).
-  2. Build a case-insensitive regex or text-index query on `search` when present.
-  3. Query with `.sort({ name: 1 }).skip((page-1)*limit).limit(limit)`, plus a `countDocuments` for `total`.
+  1. Trim the optional `search` query parameter.
+  2. Build a case-insensitive partial-match query on `name` when `search` is present.
+  3. Query all matches with `.sort({ name: 1 })`.
   4. Map `_id` → `id` in the response.
 
 ## 2. Add a medicine

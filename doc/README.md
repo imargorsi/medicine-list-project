@@ -15,7 +15,7 @@ Also read [03-open-questions.md](03-open-questions.md) — decisions that need y
 2. Add `MONGODB_URI` to a new `.env.local` (never commit it) and create `.env.example` with a placeholder.
 3. Create `src/lib/mongodb.ts` — a cached connection helper (Next.js dev hot-reload will re-run module code, so cache the client on `globalThis` to avoid opening a new connection per request).
 4. Create the `medicines` collection and its route handlers under `src/app/api/medicines/` (doc 01).
-5. Swap the in-memory handlers in `src/app/page.tsx` for real fetch calls to `/api/medicines` and confirm the Medicines tab works end to end (add, edit, delete, search, pagination).
+5. Swap the in-memory handlers in `src/app/page.tsx` for real fetch calls to `/api/medicines` and confirm the Medicines tab works end to end (add, edit, delete, search).
 6. Create the `lists` collection and its route handlers under `src/app/api/lists/` (doc 02).
 7. Swap `handleSaveList` and the saved-lists load in `src/app/page.tsx` for real fetch calls to `/api/lists` and confirm Create List + Saved Lists tabs work end to end.
 8. Once the response shape is proven out, update the "Routes And API" section of [AGENTS.md](../AGENTS.md) with the final envelope — it currently says no convention exists yet.
@@ -28,7 +28,7 @@ Also read [03-open-questions.md](03-open-questions.md) — decisions that need y
   { "success": true, "data": {} }
   { "success": false, "error": { "message": "..." } }
   ```
-- Paginated responses nest pagination info under `meta`:
+- If pagination is added later, paginated responses nest pagination info under `meta`:
   ```json
   {
     "success": true,

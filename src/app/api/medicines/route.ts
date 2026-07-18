@@ -2,7 +2,8 @@ import { NextRequest } from "next/server";
 
 import { ApiResponse } from "@/lib/api/response";
 import { createMedicine } from "@/lib/medicines/create-medicine";
-import { createMedicineSchema } from "@/lib/validators/medicine";
+import { listMedicines } from "@/lib/medicines/list-medicines";
+import { createMedicineSchema, listMedicinesQuerySchema } from "@/lib/validators/medicine";
 
 export async function POST(request: NextRequest) {
   try {
@@ -28,5 +29,33 @@ export async function POST(request: NextRequest) {
     return error instanceof Error
       ? ApiResponse.error(error.message, 500)
       : ApiResponse.error("Internal server error", 500);
+  }
+}
+
+
+
+export async function GET(request: NextRequest) {
+
+
+  try {
+
+    const searchParams = request.nextUrl.searchParams;
+
+    const parsed = listMedicinesQuerySchema.safeParse({ search: searchParams.get("search") ?? undefined });
+
+    if (!parsed.success) {
+      const message = parsed.error.issues[0]?.message ?? "Invalid request";
+      return ApiResponse.error(message, 400);
+    }
+
+    const medicines = await listMedicines(parsed.data);
+
+    return ApiResponse.success(medicines, 200);
+
+  } catch (error) {
+    return error instanceof Error
+      ? ApiResponse.error(error.message, 500)
+      : ApiResponse.error("Internal server error", 500);
+
   }
 }
