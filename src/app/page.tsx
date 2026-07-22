@@ -13,12 +13,10 @@ import type {
   MedicineListItem,
 } from "@/types/medicine";
 
-// NOTE: Medicines are backed by /api/medicines. Monthly lists still live in
-// client state only — swap them for /api/lists once that backend exists.
+// Medicines and monthly lists are backed by /api/medicines and /api/lists.
 
 type ApiResult<T> =
-  | { success: true; data: T }
-  | { success: false; error: { message: string } };
+  { success: true; data: T } | { success: false; error: { message: string } };
 
 function createId() {
   return crypto.randomUUID();
@@ -33,6 +31,7 @@ function getCurrentMonthValue() {
 export default function Home() {
   const [medicines, setMedicines] = useState<Medicine[]>([]);
   const [savedLists, setSavedLists] = useState<MedicineList[]>([]);
+  const [selectedListId, setSelectedListId] = useState("");
   const [activeTab, setActiveTab] = useState("create-list");
   const [isSavingList, setIsSavingList] = useState(false);
 
@@ -61,7 +60,28 @@ export default function Home() {
       }
     };
 
+    const loadLists = async () => {
+      try {
+        const res = await fetch("/api/lists");
+        const result: ApiResult<MedicineList[]> = await res.json();
+        if (!result.success) {
+          toast.error(result.error.message);
+          return;
+        }
+        setSavedLists(result.data);
+        setSelectedListId((current) => {
+          if (current && result.data.some((list) => list.id === current)) {
+            return current;
+          }
+          return result.data[0]?.id ?? "";
+        });
+      } catch {
+        toast.error("Failed to load lists.");
+      }
+    };
+
     void loadMedicines();
+    void loadLists();
   }, []);
 
   const handleAddMedicine = async (data: {
@@ -79,9 +99,9 @@ export default function Home() {
         toast.error(result.error.message);
         return;
       }
-  setMedicines((current) =>
-    [...current, result.data].sort((a, b) => a.name.localeCompare(b.name)),
-  );
+      setMedicines((current) =>
+        [...current, result.data].sort((a, b) => a.name.localeCompare(b.name)),
+      );
       toast.success("Medicine added.");
     } catch {
       toast.error("Failed to add medicine.");
@@ -160,26 +180,39 @@ export default function Home() {
     setDraftItems((current) => current.filter((item) => item.id !== itemId));
   };
 
-  const handleSaveList = () => {
+  const handleSaveList = async () => {
     if (!listName.trim() || !month || draftItems.length === 0) return;
 
     setIsSavingList(true);
-    const newList: MedicineList = {
-      id: createId(),
-      list_name: listName.trim(),
-      month,
-      created_at: new Date().toISOString(),
-      items: draftItems.map((item) => ({
-        ...item,
-        id: createId(),
-      })),
-    };
+    try {
+      const res = await fetch("/api/lists", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          list_name: listName.trim(),
+          month,
+          items: draftItems.map((item) => ({
+            medicine_id: item.medicine_id,
+            quantity: item.quantity,
+          })),
+        }),
+      });
+      const result: ApiResult<MedicineList> = await res.json();
+      if (!result.success) {
+        toast.error(result.error.message);
+        return;
+      }
 
-    setSavedLists((current) => [newList, ...current]);
-    resetDraft();
-    setActiveTab("saved-lists");
-    toast.success("List saved successfully.");
-    setIsSavingList(false);
+      setSavedLists((current) => [result.data, ...current]);
+      setSelectedListId(result.data.id);
+      resetDraft();
+      setActiveTab("saved-lists");
+      toast.success("List saved successfully.");
+    } catch {
+      toast.error("Failed to save list.");
+    } finally {
+      setIsSavingList(false);
+    }
   };
 
   const sortedMedicines = useMemo(
@@ -232,7 +265,12 @@ export default function Home() {
           </TabsContent>
 
           <TabsContent value="saved-lists" className="mt-6">
-            <SavedListsSection lists={savedLists} medicines={medicines} />
+            <SavedListsSection
+              lists={savedLists}
+              medicines={medicines}
+              selectedListId={selectedListId}
+              onSelectList={setSelectedListId}
+            />
           </TabsContent>
         </Tabs>
       </div>
