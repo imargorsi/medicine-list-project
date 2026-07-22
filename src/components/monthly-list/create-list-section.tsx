@@ -68,8 +68,10 @@ export function CreateListSection({
       draftItems.map((item) => ({
         ...item,
         medicine_name:
+          item.medicine_name ??
           medicines.find((medicine) => medicine.id === item.medicine_id)
-            ?.name ?? "Unknown medicine",
+            ?.name ??
+          "Unknown medicine",
       })),
     [draftItems, medicines],
   );
@@ -139,7 +141,7 @@ export function CreateListSection({
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select medicine" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent position="popper" side="bottom" sideOffset={4}>
                   {medicines.map((medicine) => (
                     <SelectItem key={medicine.id} value={medicine.id}>
                       {medicine.name}

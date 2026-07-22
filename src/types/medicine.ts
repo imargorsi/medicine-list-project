@@ -10,6 +10,8 @@ export type MedicineListItem = {
   list_id: string;
   medicine_id: string;
   quantity: number;
+  /** Snapshotted at save time when loaded from the API */
+  medicine_name?: string;
 };
 
 export type MedicineList = {

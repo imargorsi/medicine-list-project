@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 
 import {
   FinalListOutput,
@@ -20,22 +20,16 @@ import type { Medicine, MedicineList } from "@/types/medicine";
 type SavedListsSectionProps = {
   lists: MedicineList[];
   medicines: Medicine[];
+  selectedListId: string;
+  onSelectList: (listId: string) => void;
 };
 
 export function SavedListsSection({
   lists,
   medicines,
+  selectedListId,
+  onSelectList,
 }: SavedListsSectionProps) {
-  const [selectedListId, setSelectedListId] = useState("");
-  const [prevLists, setPrevLists] = useState(lists);
-
-  if (lists !== prevLists) {
-    setPrevLists(lists);
-    if (lists.length > 0 && !lists.some((list) => list.id === selectedListId)) {
-      setSelectedListId(lists[0].id);
-    }
-  }
-
   const selectedList = lists.find((list) => list.id === selectedListId);
 
   const selectedRows = useMemo(() => {
@@ -44,6 +38,7 @@ export function SavedListsSection({
     return selectedList.items.map((item) => ({
       ...item,
       medicine_name:
+        item.medicine_name ??
         medicines.find((medicine) => medicine.id === item.medicine_id)?.name ??
         "Unknown medicine",
     }));
@@ -88,7 +83,7 @@ export function SavedListsSection({
                 <Button
                   variant={selectedListId === list.id ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setSelectedListId(list.id)}
+                  onClick={() => onSelectList(list.id)}
                 >
                   View
                 </Button>
