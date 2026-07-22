@@ -1,5 +1,6 @@
 "use client";
 
+import { Trash2 } from "lucide-react";
 import { useMemo } from "react";
 
 import {
@@ -22,6 +23,7 @@ type SavedListsSectionProps = {
   medicines: Medicine[];
   selectedListId: string;
   onSelectList: (listId: string) => void;
+  onDeleteList: (listId: string) => void;
 };
 
 export function SavedListsSection({
@@ -29,6 +31,7 @@ export function SavedListsSection({
   medicines,
   selectedListId,
   onSelectList,
+  onDeleteList,
 }: SavedListsSectionProps) {
   const selectedList = lists.find((list) => list.id === selectedListId);
 
@@ -86,6 +89,14 @@ export function SavedListsSection({
                   onClick={() => onSelectList(list.id)}
                 >
                   View
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={() => onDeleteList(list.id)}
+                  aria-label={`Delete ${list.list_name}`}
+                >
+                  <Trash2 />
                 </Button>
               </div>
             </div>

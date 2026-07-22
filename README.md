@@ -49,6 +49,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 - `GET /api/lists` — list saved lists (newest first)
 - `POST /api/lists` — create a list
+- `DELETE /api/lists/:id` — delete a list (`204`)
 
 Full details: [doc/README.md](doc/README.md).
 

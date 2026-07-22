@@ -153,6 +153,29 @@ export default function Home() {
     }
   };
 
+  const handleDeleteList = async (id: string) => {
+    try {
+      const res = await fetch(`/api/lists/${id}`, { method: "DELETE" });
+      if (!res.ok) {
+        const result: ApiResult<never> = await res.json();
+        toast.error(
+          result.success ? "Failed to delete list." : result.error.message,
+        );
+        return;
+      }
+
+      setSavedLists((current) => current.filter((list) => list.id !== id));
+      setSelectedListId((selected) => {
+        if (selected !== id) return selected;
+        const remaining = savedLists.filter((list) => list.id !== id);
+        return remaining[0]?.id ?? "";
+      });
+      toast.success("List deleted.");
+    } catch {
+      toast.error("Failed to delete list.");
+    }
+  };
+
   const handleAddDraftItem = (medicineId: string, quantity: number) => {
     setDraftItems((current) => {
       const existingItem = current.find(
@@ -270,6 +293,7 @@ export default function Home() {
               medicines={medicines}
               selectedListId={selectedListId}
               onSelectList={setSelectedListId}
+              onDeleteList={handleDeleteList}
             />
           </TabsContent>
         </Tabs>
